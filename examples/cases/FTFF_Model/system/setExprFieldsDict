@@ -19,7 +19,7 @@ commonSettings
 {
     // Corner points of the rectangular region for all expressions
     point1   (0 0 -0.017); // First corner point
-    point2   (0.015 0.00044 0); // Opposite corner point
+    point2   (0.015 0.00042 0); // Opposite corner point
 };
 
 expressions
@@ -71,6 +71,42 @@ expressions
             point2   $commonSettings.point2;
             k0     9.18e10;  // Lower porosity limit
             k1     9.18e10;    // Upper porosity limit
+        }
+
+        variables
+        (
+            "x_min = min($[(vector)constants.point1].x(), $[(vector)constants.point2].x())"
+            "x_max = max($[(vector)constants.point1].x(), $[(vector)constants.point2].x())"
+            "y_min = min($[(vector)constants.point1].y(), $[(vector)constants.point2].y())"
+            "y_max = max($[(vector)constants.point1].y(), $[(vector)constants.point2].y())"
+            "z_min = min($[(vector)constants.point1].z(), $[(vector)constants.point2].z())"
+            "z_max = max($[(vector)constants.point1].z(), $[(vector)constants.point2].z())"
+        );
+
+        fieldMask
+        #{
+            pos().x() >= x_min && pos().x() <= x_max &&
+            pos().y() >= y_min && pos().y() <= y_max &&
+            pos().z() >= z_min && pos().z() <= z_max
+        #};
+
+        expression
+        #{
+            (($[constants.k1] - $[constants.k0]) * (pos().y() - y_min) / (y_max - y_min)) + $[constants.k0]
+        #};
+    }
+
+    forchCoeff
+    {
+        field       forchCoeff;
+        dimensions  [0 -1 0 0 0 0 0];
+
+        constants
+        {
+            point1   $commonSettings.point1;
+            point2   $commonSettings.point2;
+            k0     3191.1291419;
+            k1     3191.1291419;
         }
 
         variables
